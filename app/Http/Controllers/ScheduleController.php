@@ -1,0 +1,96 @@
+<?php
+
+namespace App\Http\Controllers;
+
+use App\Models\Schedule;
+use Illuminate\Http\Request;
+
+use function PHPUnit\Framework\isNull;
+
+class ScheduleController extends Controller
+{
+    /**
+     * Display a listing of the resource.
+     */
+    public function index()
+    {
+        $schedules = Schedule::with('user')
+        ->orderBy('start_date','desc')
+        ->get();
+
+        return view('schedules.index', compact('schedules'));
+    }
+
+    /**
+     * Show the form for creating a new resource.
+     */
+    public function create()
+    {
+        return view('schedules.create');
+    }
+
+    /**
+     * Store a newly created resource in storage.
+     */
+    public function store(Request $request)
+    {
+        $request -> validate([
+            'subject' => 'required|max:50',
+            'start_date' => 'required|date',
+            'end_date' => 'nullable|date|after_or_equal:start_date',
+            'note'=>'required|max:400',
+        ]);
+        $data = $request->all();
+        $data['allday_flag'] = $request->has('allday_flag') ? true : false;
+        $data['end_date'] = isNull($request->input('end_date')) ?  $data['start_date'] :  $data['end_date'];
+        $request->user()->schedule()->create($data);
+
+        return redirect()->route('schedules.index');
+    }
+
+    /**
+     * Display the specified resource.
+     */
+    public function show(Schedule $schedule)
+    {
+        return view('schedules.show',compact('schedule'));
+    }
+
+    /**
+     * Show the form for editing the specified resource.
+     */
+    public function edit(Schedule $schedule)
+    {
+       return  view('schedules.edit', compact('schedule'));
+    }
+
+    /**
+     * Update the specified resource in storage.
+     */
+    public function update(Request $request, Schedule $schedule)
+    {
+        $request -> validate([
+            'subject' => 'required|max:50',
+            'start_date' => 'required|date',
+            'start_time' => 'nullable',
+            'end_date' => 'nullable|date|after_or_equal:start_date',
+            'end_time' => 'nullable',
+            'note'=>'required|max:400',
+        ]);
+        $data = $request->all();
+        $data['allday_flag'] = $request->has('allday_flag') ? true : false;
+        $data['end_date'] = isNull($request->input('end_date')) ?  $data['start_date'] :  $data['end_date'];
+        $schedule->update($data);
+
+        return redirect()->route('schedules.show',$schedule);
+    }
+
+    /**
+     * Remove the specified resource from storage.
+     */
+    public function destroy(Schedule $schedule)
+    {
+        $schedule -> delete();
+        return redirect()->route('schedules.index');
+    }
+}
