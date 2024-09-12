@@ -14,10 +14,12 @@ class ScheduleController extends Controller
      */
     public function index()
     {
-        $schedules = Schedule::with('user')
+        // $schedules = Schedule::with('user')
+        // ->orderBy('start_date','desc')
+        // ->get();
+        $schedules = Schedule::with(['user'])
         ->orderBy('start_date','desc')
         ->get();
-
         return view('schedules.index', compact('schedules'));
     }
 
@@ -34,15 +36,18 @@ class ScheduleController extends Controller
      */
     public function store(Request $request)
     {
+        $data = $request->all();
+        $data['start_time'] = (isNull($request->input('start_time'))&&($request->has('allday_flag'))) ? '00:00':NULL;
         $request -> validate([
             'subject' => 'required|max:50',
-            'start_date' => 'required|date',
-            'end_date' => 'nullable|date|after_or_equal:start_date',
-            'note'=>'required|max:400',
+            'start_time' => 'required',
+            'end_date' => 'nullable',
+            'end_time' => 'nullable',
+            'note'=>'nullable|max:400',
         ]);
-        $data = $request->all();
-        $data['allday_flag'] = $request->has('allday_flag') ? true : false;
+        $data['allday_flag'] = $request->has('allday_flag') ? 1 : 0;
         $data['end_date'] = isNull($request->input('end_date')) ?  $data['start_date'] :  $data['end_date'];
+        $data['end_time'] = isNull($request->input('end_time')) ?  $data['start_time'] :  $data['end_time'];
         $request->user()->schedule()->create($data);
 
         return redirect()->route('schedules.index');
@@ -69,17 +74,21 @@ class ScheduleController extends Controller
      */
     public function update(Request $request, Schedule $schedule)
     {
+        $data = $request->all();
+        $data['start_time'] = (isNull($request->input('start_time'))&&($request->has('allday_flag'))) ? '00:00':null;
+        
         $request -> validate([
             'subject' => 'required|max:50',
             'start_date' => 'required|date',
-            'start_time' => 'nullable',
-            'end_date' => 'nullable|date|after_or_equal:start_date',
+            'start_time' => 'required',
+            'end_date' => 'nullable',
             'end_time' => 'nullable',
             'note'=>'required|max:400',
         ]);
-        $data = $request->all();
-        $data['allday_flag'] = $request->has('allday_flag') ? true : false;
+
+        $data['allday_flag'] = $request->has('allday_flag') ? 1 : 0;
         $data['end_date'] = isNull($request->input('end_date')) ?  $data['start_date'] :  $data['end_date'];
+        $data['end_time'] = isNull($request->input('end_time')) ?  $data['start_time'] :  $data['end_time'];
         $schedule->update($data);
 
         return redirect()->route('schedules.show',$schedule);

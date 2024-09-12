@@ -51,5 +51,13 @@ class User extends Authenticatable
         return $this->hasMany(Schedule::class);
 
     }
+    public function group()
+    {
+        return $this ->belongsToMany(Group::class)->withTimestamps();
+    }
+    public function groupSchedules()
+    {
+        return Schedule::whereIn('user_id', $this->groups->pluck('id')->toArray())->get();
+    }
 
 }
