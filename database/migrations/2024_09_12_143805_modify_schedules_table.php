@@ -12,10 +12,8 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('schedules', function (Blueprint $table) {
-            $table->date('start_date')->nullable(false)->change();
-            $table->date('end_date')->nullable(false)->change();
-            $table->time('start_time')->nullable(false);
-            $table->time('end_time')->nullable(true);
+            $table->smallInteger('allday_flag')->nullable(true)->change();
+
 
         });
     }
@@ -25,8 +23,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::table('schedules', function (Blueprint $table) {
-            //
-        });
+        //
     }
 };

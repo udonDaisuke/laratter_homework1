@@ -28,7 +28,7 @@
             <span class="text-red-500 text-xs italic">{{ $message }}</span>
             @enderror            
             <label for="allday_flag">終日</label>
-            <input type="checkbox" name="allday_flag" id="allday_flag" {{ ($schedule -> allday_flag)? 'checked' : '' }}>
+            <input type="checkbox" name="allday_flag" id="allday_flag" {{ ($schedule -> allday_flag)===1? 'checked' : '' }}>
         </div>
         <div>
             <label for="end_date">終了</label>

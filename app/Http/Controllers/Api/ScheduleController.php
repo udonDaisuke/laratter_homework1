@@ -1,10 +1,10 @@
 <?php
 
-namespace App\Http\Controllers;
+namespace App\Http\Controllers\Api;
 
-use App\Models\Schedule;
+use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
-
+use App\Models\Schedule;
 use function PHPUnit\Framework\isNull;
 
 class ScheduleController extends Controller
@@ -20,15 +20,8 @@ class ScheduleController extends Controller
         $schedules = Schedule::with(['user'])
         ->orderBy('start_date','desc')
         ->get();
-        return view('schedules.index', compact('schedules'));
-    }
-
-    /**
-     * Show the form for creating a new resource.
-     */
-    public function create()
-    {
-        return view('schedules.create');
+        // return view('schedules.index', compact('schedules'));
+        return response()->json($schedules);
     }
 
     /**
@@ -48,9 +41,9 @@ class ScheduleController extends Controller
         $data['allday_flag'] = $request->has('allday_flag') ? 1 : 0;
         $data['end_date'] = isNull($request->input('end_date')) ?  $data['start_date'] :  $data['end_date'];
         $data['end_time'] = isNull($request->input('end_time')) ?  $data['start_time'] :  $data['end_time'];
-        $request->user()->schedule()->create($data);
+        $schedule = $request->user()->schedule()->create($data);
 
-        return redirect()->route('schedules.index');
+        return response()->json($schedule, 201);
     }
 
     /**
@@ -58,15 +51,7 @@ class ScheduleController extends Controller
      */
     public function show(Schedule $schedule)
     {
-        return view('schedules.show',compact('schedule'));
-    }
-
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit(Schedule $schedule)
-    {
-       return  view('schedules.edit', compact('schedule'));
+        return response()->json($schedule);
     }
 
     /**
@@ -91,15 +76,16 @@ class ScheduleController extends Controller
         $data['end_time'] = isNull($request->input('end_time')) ?  $data['start_time'] :  $data['end_time'];
         $schedule->update($data);
 
-        return redirect()->route('schedules.show',$schedule);
+        // return redirect()->route('schedules.show',$schedule);
+        return response()->json($schedule);
     }
-
     /**
      * Remove the specified resource from storage.
      */
     public function destroy(Schedule $schedule)
     {
-        $schedule -> delete();
-        return redirect()->route('schedules.index');
+        $schedule->delete();
+        return response()->json(['message'=>'Schedule deleted']);
+        //
     }
 }

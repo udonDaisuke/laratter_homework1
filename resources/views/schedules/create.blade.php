@@ -22,11 +22,23 @@
             
             <label for="allday_flag">終日</label>
             <input type="checkbox" name="allday_flag" id="allday_flag">
+            @error('start_date')
+                <span class="text-red-500 text-xs italic">{{ $message }}</span>
+            @enderror
+            @error('start_time')
+                <span class="text-red-500 text-xs italic">{{ $message }}</span>
+            @enderror
         </div>
         <div>
             <label for="end_date">終了日</label>
             <input type="date" name="end_date" id="end_date">
             <input type="time" name="end_time" id="end_time" placeholder="click">
+            @error('end_date')
+                <span class="text-red-500 text-xs italic">{{ $message }}</span>
+            @enderror
+            @error('end_time')
+                <span class="text-red-500 text-xs italic">{{ $message }}</span>
+            @enderror
         </div>
         <div>
             <label for="note">メモ</label>
